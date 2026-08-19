@@ -65,13 +65,18 @@
 
 | 항목 | 위치 | 검증 방법 |
 |---|---|---|
-| 멀티테넌트 스키마 | `supabase/migrations/20260819000100_init.sql` | 로컬 Postgres 16 적용 성공 |
-| 집계 뷰 6종 | `supabase/migrations/20260819000200_views.sql` | 대표 데이터로 6개 뷰 전부 쿼리 확인 |
-| 시드 196/45/5행 | `supabase/seed/*.sql` | 적재 후 count 확인 |
+| 멀티테넌트 스키마·집계 뷰 | `supabase/migrations/20260819000100_init.sql`, `20260819000200_views.sql` | 로컬 Supabase/Postgres 17에서 테이블 10개·뷰 7개 확인 |
+| 권한·뷰·무결성 보강 | `supabase/migrations/20260819000300_permissions_and_view_fixes.sql` | anon 쓰기·운영 테이블 접근 거부와 service_role 권한 확인 |
+| 필수 확장 | `supabase/migrations/20260819000400_required_extensions.sql` | 로컬 DB에서 `pg_cron`, `pg_net` 존재 확인 |
+| 시드 196/45/5행 | `supabase/seed/*.sql` | `supabase db reset` 후 count 확인 |
+| DB 회귀 테스트 | `supabase/tests/database/*.sql` | `supabase test db`: 4파일·82 assertion 통과 |
 | 시드 생성기 | `scripts/generate_seed.py` | 재실행 멱등성 확인 |
 | 니케 이미지 397장 | `assets/nikke/` | 196종 전부 base 파일 존재 확인 |
-| 보스 이미지 65장 | `assets/boss/` | — |
-| 모바일 UI 목업 | `docs/mockup.html` | 390px 뷰포트 렌더 확인 |
+| 보스 이미지 65장 | `assets/boss/` | jsDelivr 포함 전체 이미지 462장 HTTP 200 확인 |
+| Next.js 대시보드 | `src/app/`, `src/components/`, `src/lib/` | lint·typecheck·build, Vitest 28개, 360/1440px QA 통과 |
+| 개요·조합·추이·로딩·OG·PWA 기반 | `/u/[area]/[guild]`, `public/sw.js` | URL 기간 상태, 자동 수집 재확인, OG/manifest/SW HTTP 200 확인 |
+| 운영자 인증 경계 | `src/app/admin/` | 서버 비밀번호·8시간 서명 쿠키·미설정 차단 테스트 통과 |
+| Phase 0 수집 도우미 | `docs/phase0-console.js` | 구문·lint 확인. 실제 호출은 로그인한 사용자가 실행해야 함 |
 
 ### 미완료 ⏳
 
@@ -79,10 +84,11 @@
 |---|---|
 | Phase 0 인증 검증 | **사람이 브라우저에서 해야 함.** 자동화 불가 (로그인 필요) |
 | 수집 Edge Function | Phase 0 결과 |
-| pg_cron 등록 | 수집 함수 |
-| Next.js 대시보드 | 없음 — 지금 시작해도 됨 |
-| Supabase 프로젝트 생성 | 사용자 승인 |
-| Vercel 배포 | Next.js |
+| 디스패처·pg_cron 등록·온디맨드 수집 | 수집 함수 |
+| 운영자 실제 세션·큐·계수 작업 | Phase 0 결과, 수집 함수, hosted Supabase |
+| Supabase 프로젝트 생성·실적용 | 사용자 승인과 Supabase CLI 로그인 |
+| Vercel 배포 | Vercel CLI 로그인과 hosted 환경변수 |
+| 주 1회 Google Sheets 백업 | hosted DB, Google 서비스 계정·시트 권한, 크론 |
 
 ### 검증된 사실 몇 가지 ✅
 
@@ -325,12 +331,16 @@ fetch('https://api.blablalink.com/api/game/proxy/Game/GetGuildMembers', {
 4. **쓰기는 `service_role` 만.** `auth_session` / `sync_log` 는 RLS 만 켜고 정책을
    만들지 않았다 = anon/authenticated 전면 차단. ⛔ 여기에 정책을 추가하지 말 것.
 
+5. **미참여 완료 판정은 `guilds.roster_state = 'complete'` 일 때만 한다.** `limited`는
+   공격 기록에 등장한 인원만 아는 상태이고, `unknown`은 아직 판정 근거가 없다.
+   ⛔ 부분 명단이나 빈 명단을 보고 “전원 티켓 사용”으로 표시하지 말 것.
+
 ### 테이블 요약
 
 | 테이블 | 키 | 역할 |
 |---|---|---|
 | `areas` | `area_id` | 서버 지역 (시드됨) |
-| `guilds` | `(area_id, guild_id)` | 테넌트. `sync_state`, `last_viewed` 가 크론 큐를 움직인다 |
+| `guilds` | `(area_id, guild_id)` | 테넌트. `sync_state`, `last_viewed`가 큐를, `roster_state`가 미참여 정확도를 나타낸다 |
 | `nikkes` | `tid_prefix` | 니케 마스터 (전역, 196행 시드됨) |
 | `members` | `(area_id, guild_id, openid)` | 길드원. 미참여 판정의 기준 |
 | `attacks` | `id` + unique 제약 | 공격 1건 = 1행. 이 프로젝트의 심장 |
@@ -348,7 +358,7 @@ fetch('https://api.blablalink.com/api/game/proxy/Game/GetGuildMembers', {
 | `v_participation` | **미참여 체크** | `members` 기준 LEFT JOIN → 기록 0건도 0/3 으로 잡힘 ✅ |
 | `v_season_totals` | 시즌 추이 | 차수별 총딜·참여자 수 |
 | `v_combo_stats` | 조합 분석 | 이름 정렬 배열을 조합 키로 → 슬롯 순서 달라도 하나로 묶임 ✅ |
-| `v_nikke_usage` | 조합 필터 | 니케별 출전 횟수·평균 딜 |
+| `v_nikke_usage` | 조합 필터 | Day·난이도·니케별 출전 횟수·평균 딜 |
 | `v_member_growth` | 개인 성장 | `lag()` 로 전 차수 대비 |
 | `v_sync_queue` | 크론 | 조회 시점 기준 5분/30분/6시간 차등 |
 
@@ -580,13 +590,14 @@ tid = 25301
 ## 12. 다음에 할 일 (우선순위 순)
 
 ```
-1. [사람]   Phase 0 검증 1-A, 1-B, 2, 3          ← 최우선 블로커
-2. [사람]   Supabase 프로젝트 생성 승인
-3. [사람]   GitHub 레포를 세션 소스에 추가        ← 현재 push 차단 상태
-4. [에이전트] Phase 1 전체 (0 결과와 무관)
-5. [에이전트] Phase 4.1~4.3 (목업 데이터로 선행 가능)
-6. [에이전트] Phase 0 결과 반영 → §4 갱신, 경로 확정
-7. [에이전트] Phase 2 → 3 → 4 나머지 → 5
+1. [사람]   docs/phase0-console.js 실행 + 쿠키 속성·현재 차수 기록  ← 최우선 블로커
+2. [사람]   다운로드 JSON 민감정보 재검토 후 전달
+3. [사람]   supabase login / vercel login + 프로젝트 생성 승인
+4. [에이전트] Phase 0 결과로 §4 갱신, A/A′/B 확정, 샘플 fixture 분리
+5. [에이전트] hosted Phase 1 검증 → Phase 2 수집기 구현
+6. [에이전트] Phase 3 디스패처·크론·온디맨드·last_viewed 구현
+7. [에이전트] Phase 4.6 실제 운영 기능 → Phase 5 배포·Sheets 백업
 ```
 
-**4번과 5번은 지금 당장 시작할 수 있다.** 1번을 기다리는 동안 놀지 말 것.
+로컬에서 가능한 Phase 1·4 기반은 완료했다. 이제 1~3번의 실제 응답과 외부 프로젝트가
+없으면 API 계약을 추측하거나 배포 성공을 꾸미게 되므로 다음 단계로 넘어가지 말 것.

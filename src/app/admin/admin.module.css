@@ -1,0 +1,570 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  flex: 0 0 auto;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.adminLabel {
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--ink-subtle);
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.centeredMain {
+  width: min(calc(100% - 32px), 560px);
+  flex: 1;
+  margin: auto;
+  padding: 56px 0 72px;
+  display: grid;
+  place-items: center;
+}
+
+.lockCard {
+  width: 100%;
+  padding: 34px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-lg);
+}
+
+.heroIcon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 22px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+}
+
+.heroIcon svg {
+  width: 23px;
+  height: 23px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+}
+
+.lockCard h1,
+.consoleHeading h1 {
+  margin: 8px 0 12px;
+  line-height: 1.1;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.lockCard h1 {
+  font-size: clamp(28px, 7vw, 38px);
+}
+
+.lead,
+.consoleHeading > div > p:last-child,
+.cardDescription,
+.nextGate p,
+.securityNote p {
+  text-wrap: pretty;
+}
+
+.lead {
+  margin: 0;
+  color: var(--ink-subtle);
+  line-height: 1.7;
+}
+
+.setupList {
+  padding: 13px 15px;
+  margin-top: 22px;
+  border: 1px solid color-mix(in srgb, var(--warning) 26%, var(--line));
+  border-radius: 12px;
+  color: var(--warning);
+  background: var(--warning-soft);
+}
+
+.setupList p {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.setupList p + p {
+  margin-top: 5px;
+}
+
+.variableGrid {
+  margin-top: 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.variableGrid > div {
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  display: grid;
+  gap: 4px;
+  background: var(--surface-soft);
+}
+
+.variableGrid code,
+.securityNote code {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.variableGrid span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.securityNote {
+  padding: 13px;
+  margin-top: 14px;
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 10px;
+  color: var(--ink-subtle);
+  background: color-mix(in srgb, var(--surface-soft) 82%, transparent);
+}
+
+.securityNote svg {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+}
+
+.securityNote p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.loginError {
+  padding: 11px 13px;
+  margin: 20px 0 0;
+  border: 1px solid color-mix(in srgb, var(--negative) 30%, var(--line));
+  border-radius: 10px;
+  color: var(--negative);
+  background: color-mix(in srgb, var(--negative) 8%, var(--surface));
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.loginForm {
+  margin-top: 24px;
+  display: grid;
+  gap: 8px;
+}
+
+.loginForm label,
+.coefficientFields label {
+  color: var(--ink-subtle);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.loginForm input,
+.coefficientFields input,
+.coefficientFields select {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 13px;
+  border: 1px solid var(--line-strong);
+  border-radius: 11px;
+  outline: 0;
+  color: var(--ink);
+  background: var(--surface-soft);
+}
+
+.loginForm input:focus-visible {
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 17%, transparent);
+}
+
+.loginForm button {
+  min-height: 48px;
+  margin-top: 6px;
+  border: 0;
+  border-radius: 11px;
+  color: #fff;
+  background: var(--accent);
+  cursor: pointer;
+  font-weight: 800;
+  transition: background-color 140ms ease, transform 140ms ease;
+}
+
+.loginForm button:hover {
+  background: var(--accent-hover);
+}
+
+.loginForm button:active,
+.logoutButton:active {
+  transform: scale(0.96);
+}
+
+.sessionHint {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  text-align: center;
+}
+
+.consoleMain {
+  width: min(calc(100% - 32px), var(--content));
+  flex: 1;
+  margin: 0 auto;
+  padding: 44px 0 72px;
+}
+
+.consoleHeading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.consoleHeading h1 {
+  font-size: clamp(34px, 5vw, 50px);
+}
+
+.consoleHeading > div > p:last-child {
+  max-width: 620px;
+  margin: 0;
+  color: var(--ink-subtle);
+}
+
+.logoutButton {
+  min-height: 44px;
+  padding: 0 15px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink-subtle);
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+  transition: border-color 140ms ease, color 140ms ease, transform 140ms ease;
+}
+
+.logoutButton:hover {
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+.readonlyBanner {
+  min-height: 78px;
+  padding: 14px 16px;
+  margin: 28px 0 18px;
+  border: 1px solid color-mix(in srgb, var(--warning) 28%, var(--line));
+  border-radius: var(--radius-md);
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 13px;
+  color: var(--warning);
+  background: color-mix(in srgb, var(--warning-soft) 56%, var(--surface));
+}
+
+.readonlyBanner > svg {
+  width: 22px;
+  height: 22px;
+}
+
+.readonlyBanner strong {
+  font-size: 13px;
+}
+
+.readonlyBanner p {
+  margin: 2px 0 0;
+  color: var(--ink-subtle);
+  font-size: 11px;
+}
+
+.readonlyBanner > span,
+.statusChip {
+  padding: 5px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.readonlyBanner > span {
+  color: var(--warning);
+  background: var(--warning-soft);
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.actionCard {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.cardHeading {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  align-items: center;
+  gap: 11px;
+}
+
+.cardIcon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+}
+
+.cardIcon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.cardHeading h2 {
+  margin: 0 0 3px;
+  font-size: 17px;
+  letter-spacing: -0.025em;
+}
+
+.statusChip {
+  display: inline-flex;
+  color: var(--muted);
+  background: var(--surface-soft);
+}
+
+.cardDescription {
+  min-height: 64px;
+  margin: 18px 0 14px;
+  color: var(--ink-subtle);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.detailList {
+  padding: 2px 0;
+  margin: 0 0 16px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.detailList > div {
+  min-height: 39px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.detailList dt,
+.detailList dd {
+  font-size: 11px;
+}
+
+.detailList dt {
+  color: var(--muted);
+}
+
+.detailList dd {
+  margin: 0;
+  color: var(--ink-subtle);
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+
+.coefficientFields {
+  padding: 0;
+  margin: 0 0 16px;
+  border: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.coefficientFields label {
+  display: grid;
+  gap: 6px;
+}
+
+.coefficientFields input,
+.coefficientFields select {
+  min-height: 42px;
+  padding: 0 10px;
+  color: var(--muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.disabledButton {
+  min-height: 44px;
+  margin-top: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--muted);
+  background: var(--surface-soft);
+  cursor: not-allowed;
+  font-size: 11px;
+  font-weight: 800;
+  opacity: 0.78;
+}
+
+.nextGate {
+  padding: 16px 18px;
+  margin-top: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  background: color-mix(in srgb, var(--surface) 74%, transparent);
+}
+
+.nextGate > svg {
+  width: 21px;
+  height: 21px;
+  color: var(--muted);
+}
+
+.nextGate strong {
+  font-size: 12px;
+}
+
+.nextGate p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.footer {
+  width: min(calc(100% - 32px), var(--content));
+  min-height: 72px;
+  padding: 16px 0;
+  margin: 0 auto;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.footer p {
+  margin: 0;
+}
+
+.footer a {
+  min-height: 44px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9px;
+  color: var(--ink-subtle);
+  font-weight: 800;
+}
+
+.footer a:hover {
+  color: var(--ink);
+  background: var(--surface);
+}
+
+@media (max-width: 840px) {
+  .cardGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .cardDescription {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 620px) {
+  .adminLabel {
+    display: none;
+  }
+
+  .centeredMain,
+  .consoleMain {
+    padding-top: 28px;
+  }
+
+  .lockCard {
+    padding: 24px;
+    border-radius: 20px;
+  }
+
+  .consoleHeading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .logoutButton {
+    width: 100%;
+  }
+
+  .consoleHeading form {
+    width: 100%;
+  }
+
+  .readonlyBanner {
+    grid-template-columns: 24px minmax(0, 1fr);
+  }
+
+  .readonlyBanner > span {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .coefficientFields {
+    grid-template-columns: 1fr;
+  }
+
+  .footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loginForm button,
+  .logoutButton {
+    transition-duration: 0.01ms;
+  }
+}
