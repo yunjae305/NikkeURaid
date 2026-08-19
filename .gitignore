@@ -9,3 +9,10 @@ dist/
 .DS_Store
 *.log
 docs/samples/*.curl
+coverage/
+*.tsbuildinfo
+__pycache__/
+*.py[cod]
+.runlogs/
+supabase/.temp/
+supabase/.branches/
