@@ -1,8 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
   aggregateBossAttacks,
   aggregateNikkeUsageRows,
+  getSupabaseGuildSummary,
   SupabaseReadError,
 } from "./repository";
 
@@ -35,5 +36,21 @@ describe("Supabase dashboard row aggregation", () => {
     expect(() =>
       aggregateBossAttacks([{ boss: "Boss", total_damage: "not-a-number" }]),
     ).toThrow(SupabaseReadError);
+  });
+
+  it("returns null when maybeSingle finds no guild", async () => {
+    const query = {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+    };
+    const client = {
+      from: vi.fn(() => query),
+    } as unknown as Parameters<typeof getSupabaseGuildSummary>[0];
+
+    await expect(
+      getSupabaseGuildSummary(client, 83, "999999999999"),
+    ).resolves.toBeNull();
+    expect(query.maybeSingle).toHaveBeenCalledOnce();
   });
 });

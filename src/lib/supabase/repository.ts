@@ -168,8 +168,11 @@ export async function getSupabaseGuildSummary(
     .eq("area_id", areaId)
     .eq("guild_id", guildId)
     .maybeSingle();
-  const row = requireData(result, "guilds");
+  if (result.error) {
+    throw new SupabaseReadError("guilds", result.error.message);
+  }
 
+  const row = result.data;
   if (!row) return null;
   return {
     areaId,
