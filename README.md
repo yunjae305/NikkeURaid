@@ -2,7 +2,9 @@
 
 승리의 여신: 니케 유니온 레이드 기록 대시보드입니다. 서버와 유니온 ID로 딜 순위, 남은 티켓, 조합 분석, 시즌 추이를 확인합니다.
 
-현재 웹앱은 실행할 수 있지만 **샘플 데이터 모드**가 기본입니다. 실제 BlablaLink 데이터 수집은 [Phase 0 권한 검증](docs/phase0-verification.md)이 끝난 뒤 연결합니다.
+**실서비스:** <https://nikkeuraid.vercel.app>
+
+웹앱과 Supabase 운영 DB는 배포됐습니다. 현재는 BlablaLink 실데이터 수집기 연결 전이라 등록되지 않은 유니온은 데이터 없음으로 표시됩니다. [Phase 0 권한 검증](docs/phase0-verification.md)이 끝나면 ID 최초 조회와 자동 갱신을 연결합니다.
 
 ## 실행
 
@@ -58,13 +60,13 @@ python -B scripts/generate_seed.py
 
 | 영역 | 상태 |
 |---|---|
-| 랜딩·개요·조합·추이·OG·PWA | 샘플/읽기 UI 완료 |
-| Supabase 스키마·뷰·시드·권한 테스트 | 로컬 `db reset`·82개 DB 테스트 완료 |
+| 랜딩·개요·조합·추이·OG·PWA | Vercel 배포 완료 |
+| Supabase 스키마·뷰·시드·권한 | 서울 리전 운영 DB 적용 완료 |
 | 운영자 화면 | 서버 비밀번호 잠금 완료, 외부 작업은 비활성 |
 | BlablaLink 실제 수집기·스케줄러 | Phase 0 결과 대기 |
-| Supabase·Vercel 실배포 | 프로젝트 자격증명 필요 |
+| Supabase·Vercel 실배포 | 완료 |
 
-닉네임은 손으로 입력하지 않는 설계입니다. 명단과 공격 기록에서 자동 수집하고, 동일인은 닉네임이 아닌 `openid`로 연결합니다. 다만 현재 실제 수집기는 아직 연결되지 않았습니다.
+닉네임은 손으로 입력하지 않습니다. 명단과 공격 기록에서 자동 수집하고, 공격 기록의 `openid`를 중심으로 동일인을 연결합니다. 명단 응답의 실제 식별자 매핑은 Phase 0 샘플로 최종 확정합니다.
 
 실데이터 연결에 필요한 결과는 로그인한 BlablaLink 페이지에서 [Phase 0 도우미](docs/phase0-console.js)를 실행해 받을 수 있습니다.
 

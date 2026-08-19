@@ -20,6 +20,10 @@
       intl_game_id: "29080",
       language: "ko",
       env: "prod",
+      data_statistics_scene: "outer",
+      data_statistics_page_id: globalThis.location.href,
+      data_statistics_client_type: "pc_web",
+      data_statistics_lang: "ko",
     }),
   };
 
@@ -136,9 +140,10 @@
     return pseudonyms.get(key);
   };
   const secretKey = /(cookie|token|authorization|session|secret)/i;
-  const identityKey = /(openid|open_id|intl_openid)/i;
+  const identityKey = /(openid|open_id|intl_openid|member_id|memberid)/i;
   const nicknameKey = /(nickname|nick_name|user_name|member_name|leader_name)/i;
   const guildKey = /guild_id/i;
+  const guildNameKey = /(guild_name|union_name)/i;
 
   const redact = (value, key = "") => {
     if (secretKey.test(key)) return "REDACTED_SECRET";
@@ -147,6 +152,9 @@
     }
     if (nicknameKey.test(key) && value !== null && typeof value !== "object") {
       return pseudonym("NICKNAME", value);
+    }
+    if (guildNameKey.test(key) && value !== null && typeof value !== "object") {
+      return pseudonym("GUILD_NAME", value);
     }
     if (guildKey.test(key) && value !== null && typeof value !== "object") {
       return value === ownGuildId ? "REDACTED_OWN_GUILD" : "REDACTED_OTHER_GUILD";
