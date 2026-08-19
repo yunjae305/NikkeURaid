@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useMemo, useState, useSyncExternalStore } from "react";
+import { FormEvent, useMemo, useRef, useState, useSyncExternalStore } from "react";
 
 import { ChevronRightIcon, SearchIcon } from "@/components/shared/icons";
+import { requestGuildLookup } from "@/lib/guild-lookup-client";
+import type { AreaId } from "@/lib/types";
 
 const areas = [
   { id: 83, label: "한국" },
@@ -34,9 +36,11 @@ function readRecentGuilds() {
 
 export function GuildSearch() {
   const router = useRouter();
-  const [areaId, setAreaId] = useState(83);
+  const [areaId, setAreaId] = useState<AreaId>(83);
   const [guildId, setGuildId] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitLock = useRef(false);
   const recentSnapshot = useSyncExternalStore(
     subscribeToStorage,
     readRecentGuilds,
@@ -51,8 +55,10 @@ export function GuildSearch() {
     }
   }, [recentSnapshot]);
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (submitLock.current) return;
+
     const normalized = guildId.trim();
 
     if (!/^\d{1,12}$/.test(normalized)) {
@@ -61,7 +67,21 @@ export function GuildSearch() {
     }
 
     setError("");
-    router.push(`/u/${areaId}/${normalized}`);
+    submitLock.current = true;
+    setIsSubmitting(true);
+
+    try {
+      const result = await requestGuildLookup(areaId, normalized);
+      router.push(result.href);
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : "조회 요청을 처리하지 못했습니다. 잠시 뒤 다시 시도해 주세요.",
+      );
+      submitLock.current = false;
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -74,7 +94,7 @@ export function GuildSearch() {
         <SearchIcon aria-hidden="true" />
       </div>
 
-      <form onSubmit={submit} noValidate>
+      <form onSubmit={submit} noValidate aria-busy={isSubmitting}>
         <fieldset className="area-fieldset">
           <legend>서버</legend>
           <div className="area-options">
@@ -84,6 +104,7 @@ export function GuildSearch() {
                 className="area-button"
                 type="button"
                 aria-pressed={areaId === area.id}
+                disabled={isSubmitting}
                 onClick={() => setAreaId(area.id)}
               >
                 {area.label}
@@ -103,6 +124,7 @@ export function GuildSearch() {
             autoComplete="off"
             placeholder="예: 28517"
             value={guildId}
+            disabled={isSubmitting}
             aria-describedby={error ? "guild-id-error" : "guild-id-hint"}
             aria-invalid={Boolean(error)}
             onChange={(event) => {
@@ -110,12 +132,21 @@ export function GuildSearch() {
               if (error) setError("");
             }}
           />
-          <button className="search-submit" type="submit" aria-label="유니온 조회">
-            <ChevronRightIcon aria-hidden="true" />
+          <button
+            className="search-submit"
+            type="submit"
+            aria-label={isSubmitting ? "유니온 조회 요청 중" : "유니온 조회"}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <span className="submit-spinner" aria-hidden="true" />
+            ) : (
+              <ChevronRightIcon aria-hidden="true" />
+            )}
           </button>
         </div>
         <p className={error ? "field-message error-message" : "field-message"} id={error ? "guild-id-error" : "guild-id-hint"}>
-          {error || "게임 안에서 보이는 숫자 ID를 입력하세요."}
+          {error || (isSubmitting ? "유니온을 확인하고 수집을 요청하는 중입니다." : "게임 안에서 보이는 숫자 ID를 입력하세요.")}
         </p>
       </form>
 

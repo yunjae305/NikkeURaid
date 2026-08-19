@@ -15,8 +15,17 @@ insert into public.guilds (
   (81, 'tap-q-fresh', 'Fresh', 'ok', now() - interval '1 minute', now()),
   (81, 'tap-q-stale', 'Stale', 'ok', now() - interval '7 hours', now() - interval '91 days'),
   (81, 'tap-q-auth', 'Auth required', 'auth_required', null, now()),
-  (81, 'tap-q-syncing', 'Syncing', 'syncing', null, now()),
   (81, 'tap-q-dead', 'Dead', 'dead', null, now());
+
+insert into public.guilds (
+  area_id, guild_id, name, sync_state, last_synced, last_viewed,
+  sync_token, sync_lease_until, sync_trigger
+) values (
+  81, 'tap-q-syncing', 'Syncing', 'syncing', null, now(),
+  '00000000-0000-4000-8000-000000000099'::uuid,
+  now() + interval '2 minutes',
+  'cron'
+);
 
 select is(
   (

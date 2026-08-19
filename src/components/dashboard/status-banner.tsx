@@ -19,21 +19,30 @@ export function StatusBanner({ model }: { model: DashboardModel }) {
   const kind = getStatusBannerKind(model);
 
   if (kind === "syncing") {
+    const pending = model.guild.syncState === "pending";
     return (
       <aside className="status-banner syncing-banner" role="status" aria-live="polite">
-        <SyncRefresh />
         <span className="status-spinner" aria-hidden="true" />
         <div>
-          <strong>첫 기록을 수집하고 있습니다.</strong>
-          <p>5초마다 상태를 확인하며, 완료되면 최신 기록을 자동으로 표시합니다.</p>
+          <strong>
+            {pending
+              ? "수집 요청이 접수되었습니다."
+              : "첫 기록을 수집하고 있습니다."}
+          </strong>
+          <p>
+            {pending
+              ? "수집 순서를 기다리는 중입니다. 이 화면에서 5초마다 상태를 확인합니다."
+              : "완료되면 최신 기록을 이 화면에 자동으로 표시합니다."}
+          </p>
           <span
-            aria-label="첫 기록 수집 진행 중"
+            aria-label={pending ? "유니온 수집 대기 중" : "첫 기록 수집 진행 중"}
             className="sync-progress"
             role="progressbar"
           >
             <span aria-hidden="true" />
           </span>
         </div>
+        <SyncRefresh />
       </aside>
     );
   }

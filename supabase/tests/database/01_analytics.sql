@@ -28,11 +28,11 @@ insert into public.members (
 
 -- Same guild_id and openid in two regions must remain completely isolated.
 insert into public.attacks (
-  area_id, guild_id, season, day, boss, openid, nickname,
+  area_id, guild_id, season, source_index, day, boss, openid, nickname,
   total_damage, captured_at
 ) values
-  (81, 'tap-isolation', 900, 1, 'Boss', 'same-user', 'JP old', 111, '2026-01-01 00:00:00+00'),
-  (82, 'tap-isolation', 900, 1, 'Boss', 'same-user', 'NA old', 999, '2026-01-01 00:00:00+00');
+  (81, 'tap-isolation', 900, 0, 1, 'Boss', 'same-user', 'JP old', 111, '2026-01-01 00:00:00+00'),
+  (82, 'tap-isolation', 900, 0, 1, 'Boss', 'same-user', 'NA old', 999, '2026-01-01 00:00:00+00');
 
 select is(
   (
@@ -66,14 +66,14 @@ select is(
 
 -- Aggregate fixture: Alice uses four tickets, Bob one, Charlie none.
 insert into public.attacks (
-  area_id, guild_id, season, day, boss, openid, nickname, sync_lv,
+  area_id, guild_id, season, source_index, day, boss, openid, nickname, sync_lv,
   total_damage, is_final_hit, captured_at
 ) values
-  (81, 'tap-aggregate', 901, 1, 'Boss A', 'alice', 'Alice old', 200, 100, false, '2026-01-02 00:00:00+00'),
-  (81, 'tap-aggregate', 901, 1, 'Boss B', 'alice', 'Alice old', 250, 300, true,  '2026-01-02 00:01:00+00'),
-  (81, 'tap-aggregate', 901, 1, 'Boss C', 'alice', 'Alice old', 230, 50,  false, '2026-01-02 00:02:00+00'),
-  (81, 'tap-aggregate', 901, 1, 'Boss D', 'alice', 'Alice old', 240, 50,  false, '2026-01-02 00:03:00+00'),
-  (81, 'tap-aggregate', 901, 1, 'Boss A', 'bob',   'Bob old',   210, 500, false, '2026-01-02 00:04:00+00');
+  (81, 'tap-aggregate', 901, 0, 1, 'Boss A', 'alice', 'Alice old', 200, 100, false, '2026-01-02 00:00:00+00'),
+  (81, 'tap-aggregate', 901, 1, 1, 'Boss B', 'alice', 'Alice old', 250, 300, true,  '2026-01-02 00:01:00+00'),
+  (81, 'tap-aggregate', 901, 2, 1, 'Boss C', 'alice', 'Alice old', 230, 50,  false, '2026-01-02 00:02:00+00'),
+  (81, 'tap-aggregate', 901, 3, 1, 'Boss D', 'alice', 'Alice old', 240, 50,  false, '2026-01-02 00:03:00+00'),
+  (81, 'tap-aggregate', 901, 4, 1, 'Boss A', 'bob',   'Bob old',   210, 500, false, '2026-01-02 00:04:00+00');
 
 select is(
   (select tries from public.v_member_daily where guild_id = 'tap-aggregate' and openid = 'alice'),
@@ -171,13 +171,13 @@ select is(
 
 -- Roster names win; without a roster row the newest captured snapshot wins.
 insert into public.attacks (
-  area_id, guild_id, season, day, boss, openid, nickname,
+  area_id, guild_id, season, source_index, day, boss, openid, nickname,
   total_damage, captured_at
 ) values
-  (81, 'tap-rename', 910, 1, 'Boss A', 'tracked', 'ZuluOld',    100, '2026-02-01 00:00:00+00'),
-  (81, 'tap-rename', 910, 1, 'Boss B', 'tracked', 'AlphaNew',  200, '2026-02-02 00:00:00+00'),
-  (81, 'tap-rename', 910, 1, 'Boss A', 'orphan',  'ZuluOld',    50, '2026-02-01 00:00:00+00'),
-  (81, 'tap-rename', 910, 1, 'Boss B', 'orphan',  'AlphaLatest', 75, '2026-02-02 00:00:00+00');
+  (81, 'tap-rename', 910, 0, 1, 'Boss A', 'tracked', 'ZuluOld',    100, '2026-02-01 00:00:00+00'),
+  (81, 'tap-rename', 910, 1, 1, 'Boss B', 'tracked', 'AlphaNew',  200, '2026-02-02 00:00:00+00'),
+  (81, 'tap-rename', 910, 2, 1, 'Boss A', 'orphan',  'ZuluOld',    50, '2026-02-01 00:00:00+00'),
+  (81, 'tap-rename', 910, 3, 1, 'Boss B', 'orphan',  'AlphaLatest', 75, '2026-02-02 00:00:00+00');
 
 select is(
   (select nickname from public.v_member_daily where guild_id = 'tap-rename' and openid = 'tracked'),
@@ -205,16 +205,16 @@ select is(
 
 -- Squad ordering is normalized into one combo key.
 insert into public.attacks (
-  area_id, guild_id, season, day, boss, difficulty, openid, nickname,
+  area_id, guild_id, season, source_index, day, boss, difficulty, openid, nickname,
   total_damage, squad, captured_at
 ) values
   (
-    81, 'tap-combo', 920, 1, 'Combo Boss', 1, 'combo-1', 'One', 100,
+    81, 'tap-combo', 920, 0, 1, 'Combo Boss', 1, 'combo-1', 'One', 100,
     '[{"slot":1,"name":"Alice"},{"slot":2,"name":"Beth"}]'::jsonb,
     '2026-03-01 00:00:00+00'
   ),
   (
-    81, 'tap-combo', 920, 1, 'Combo Boss', 1, 'combo-2', 'Two', 300,
+    81, 'tap-combo', 920, 1, 1, 'Combo Boss', 1, 'combo-2', 'Two', 300,
     '[{"slot":1,"name":"Beth"},{"slot":2,"name":"Alice"}]'::jsonb,
     '2026-03-01 00:01:00+00'
   );
@@ -269,16 +269,16 @@ select is(
 
 -- Usage rows retain their day and difficulty so the dashboard cannot mix them.
 insert into public.attacks (
-  area_id, guild_id, season, day, boss, difficulty, openid, nickname,
+  area_id, guild_id, season, source_index, day, boss, difficulty, openid, nickname,
   total_damage, squad, captured_at
 ) values
   (
-    81, 'tap-usage', 921, 1, 'Usage Boss', 1, 'usage-normal', 'Normal', 100,
+    81, 'tap-usage', 921, 0, 1, 'Usage Boss', 1, 'usage-normal', 'Normal', 100,
     '[{"slot":1,"name":"Alice"}]'::jsonb,
     '2026-03-02 00:00:00+00'
   ),
   (
-    81, 'tap-usage', 921, 2, 'Usage Boss', 2, 'usage-hard', 'Hard', 900,
+    81, 'tap-usage', 921, 1, 2, 'Usage Boss', 2, 'usage-hard', 'Hard', 900,
     '[{"slot":1,"name":"Alice"}]'::jsonb,
     '2026-03-03 00:00:00+00'
   );
@@ -309,11 +309,11 @@ select is(
 
 -- Growth compares the previous participating season, even if season ids skip.
 insert into public.attacks (
-  area_id, guild_id, season, day, boss, openid, nickname,
+  area_id, guild_id, season, source_index, day, boss, openid, nickname,
   sync_lv, total_damage, captured_at
 ) values
-  (81, 'tap-growth', 930, 1, 'Boss', 'grower', 'OldName', 200, 100, '2026-04-01 00:00:00+00'),
-  (81, 'tap-growth', 932, 1, 'Boss', 'grower', 'OlderName', 250, 250, '2026-04-02 00:00:00+00');
+  (81, 'tap-growth', 930, 0, 1, 'Boss', 'grower', 'OldName', 200, 100, '2026-04-01 00:00:00+00'),
+  (81, 'tap-growth', 932, 0, 1, 'Boss', 'grower', 'OlderName', 250, 250, '2026-04-02 00:00:00+00');
 
 select is(
   (select count(*)::int from public.v_member_growth where guild_id = 'tap-growth' and openid = 'grower'),

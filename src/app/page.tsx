@@ -3,8 +3,11 @@ import Link from "next/link";
 import { GuildSearch } from "@/components/landing/guild-search";
 import { BrandMark } from "@/components/shared/brand-mark";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { getConfiguredDataSource } from "@/lib/data";
 
 export default function HomePage() {
+  const liveData = getConfiguredDataSource() === "supabase";
+
   return (
     <div className="landing-page">
       <header className="site-header landing-header">
@@ -31,12 +34,22 @@ export default function HomePage() {
 
         <GuildSearch />
 
-        <aside className="preview-note" aria-label="개발 상태 안내">
+        <aside className="preview-note" aria-label="조회 안내">
           <div>
-            <strong>현재는 샘플 데이터 미리보기입니다.</strong>
-            <p>Phase 0 권한 검증과 실제 수집기가 연결되기 전까지 실제 길드 데이터는 표시하지 않습니다.</p>
+            <strong>
+              {liveData
+                ? "처음 찾는 유니온은 기록을 모으는 시간이 필요합니다."
+                : "현재는 샘플 데이터 미리보기입니다."}
+            </strong>
+            <p>
+              {liveData
+                ? "조회 요청 후 이 화면을 닫아도 수집은 계속되며, 같은 주소에서 결과를 확인할 수 있습니다."
+                : "Supabase와 실제 수집기가 연결되기 전까지 샘플 길드 데이터를 표시합니다."}
+            </p>
           </div>
-          <Link href="/u/83/28517?season=43&day=2">샘플 대시보드 보기</Link>
+          {!liveData ? (
+            <Link href="/u/83/28517?season=43&day=2">샘플 대시보드 보기</Link>
+          ) : null}
         </aside>
       </main>
     </div>

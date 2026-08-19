@@ -173,6 +173,8 @@ button {
 
 .icon-button:active,
 .primary-button:active,
+.secondary-button:active,
+.status-action:active,
 .search-submit:active,
 .area-button:active {
   transform: scale(0.96);
@@ -393,6 +395,26 @@ button {
 .search-submit svg {
   width: 21px;
   height: 21px;
+}
+
+.search-submit:disabled,
+.area-button:disabled,
+.input-shell input:disabled,
+.primary-button:disabled,
+.status-action:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
+.submit-spinner {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  flex: 0 0 18px;
+  border: 2px solid color-mix(in srgb, currentColor 34%, transparent);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 800ms linear infinite;
 }
 
 .field-message {
@@ -639,16 +661,32 @@ button {
   font-size: 11px;
 }
 
-.status-banner a {
+.status-banner a,
+.status-banner .status-action {
   min-height: 44px;
   padding: 0 12px;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  border: 0;
   border-radius: 9px;
   color: var(--accent-ink);
   background: var(--accent-soft);
+  cursor: pointer;
   font-size: 11px;
   font-weight: 800;
+}
+
+.status-timeout {
+  display: grid;
+  justify-items: end;
+  gap: 5px;
+}
+
+.status-timeout > span {
+  color: var(--muted);
+  font-size: 10px;
+  white-space: nowrap;
 }
 
 .preview-banner {
@@ -698,6 +736,105 @@ button {
 @keyframes sync-progress {
   from { transform: translateX(-110%); }
   to { transform: translateX(245%); }
+}
+
+.first-sync-card {
+  min-height: 390px;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  display: grid;
+  align-content: start;
+  gap: 26px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.first-sync-card h2 {
+  max-width: 620px;
+  margin: 6px 0 8px;
+  font-size: clamp(24px, 4vw, 34px);
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.first-sync-card > div > p:last-child {
+  max-width: 620px;
+  margin: 0;
+  color: var(--ink-subtle);
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+
+.sync-stage-list {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  list-style: none;
+}
+
+.sync-stage-list li {
+  min-height: 76px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  background: var(--surface-soft);
+}
+
+.sync-stage-list li > span {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--ink-subtle);
+  background: var(--line);
+  font-size: 11px;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+}
+
+.sync-stage-list strong,
+.sync-stage-list small {
+  display: block;
+}
+
+.sync-stage-list strong {
+  color: var(--ink-subtle);
+  font-size: 12px;
+}
+
+.sync-stage-list small {
+  margin-top: 2px;
+  font-size: 10px;
+}
+
+.sync-stage-list li.is-active {
+  color: var(--accent-ink);
+  border-color: color-mix(in srgb, var(--accent) 38%, var(--line));
+  background: var(--accent-soft);
+}
+
+.sync-stage-list li.is-active > span,
+.sync-stage-list li.is-complete > span {
+  color: #fff;
+  background: var(--accent);
+}
+
+.sync-stage-list li.is-active strong,
+.sync-stage-list li.is-complete strong {
+  color: var(--ink);
+}
+
+.first-sync-skeleton {
+  margin-top: 0;
 }
 
 .dashboard-tabs {
@@ -1380,6 +1517,42 @@ button {
   font-weight: 800;
 }
 
+.secondary-button {
+  min-height: 48px;
+  padding: 0 20px;
+  border: 1px solid var(--line-strong);
+  border-radius: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-subtle);
+  background: var(--surface);
+  font-weight: 800;
+}
+
+.lookup-start-state > p:not(.eyebrow) {
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+
+.lookup-actions {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.lookup-actions .primary-button {
+  gap: 8px;
+}
+
+.lookup-error {
+  max-width: 440px;
+  margin-top: 14px !important;
+  color: var(--negative) !important;
+  font-size: 13px;
+}
+
 .compact-button {
   margin-top: 24px;
 }
@@ -1524,9 +1697,24 @@ button {
     grid-template-columns: 24px minmax(0, 1fr);
   }
 
-  .status-banner a {
+  .status-banner a,
+  .status-banner .status-action,
+  .status-timeout {
     grid-column: 2;
     width: max-content;
+  }
+
+  .status-timeout {
+    justify-items: start;
+  }
+
+  .sync-stage-list {
+    grid-template-columns: 1fr;
+  }
+
+  .lookup-actions {
+    width: 100%;
+    flex-direction: column;
   }
 
   .participation-heading {

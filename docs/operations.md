@@ -1,8 +1,43 @@
 # NikkeURaid 운영 절차
 
-이 문서는 운영자 화면의 잠금 설정과 무료 Supabase 용량 한도 전 정리 절차를 다룬다.
-현재 Phase 0 API 검증과 Supabase 연결이 끝나지 않았으므로 `/admin`은 외부 작업을 수행하지 않는
-읽기 전용 준비 화면이다.
+이 문서는 실데이터 수집 배포, BlablaLink 세션 갱신, 운영자 화면 잠금과 무료 Supabase 용량 한도 전
+정리 절차를 다룬다. Phase 0 API 계약과 Supabase 연결은 검증됐으며, `/admin`의 큐 제어와 계수 저장은
+아직 읽기 전용이다.
+
+## 실데이터 수집 배포
+
+Vercel 서버에는 다음 세 환경변수가 필요하다. `SUPABASE_SERVICE_ROLE_KEY`에는 절대
+`NEXT_PUBLIC_` 접두사를 붙이지 않는다.
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+Supabase Edge Functions에는 `BLABLA_COOKIE`와 `INTERNAL_SYNC_SECRET`을 secret으로 설정한다.
+값은 저장소, 셸 기록, 로그에 남기지 않는다. 연결된 Supabase 프로젝트에 DB와 함수 세 개를 배포한다.
+
+```powershell
+npx.cmd --yes supabase@latest login
+npx.cmd --yes supabase@latest link --project-ref <PROJECT_REF>
+npx.cmd --yes supabase@latest db push --linked
+npx.cmd --yes supabase@latest functions deploy collect --project-ref <PROJECT_REF>
+npx.cmd --yes supabase@latest functions deploy dispatch --project-ref <PROJECT_REF>
+npx.cmd --yes supabase@latest functions deploy request-sync --project-ref <PROJECT_REF>
+```
+
+위 명령은 이미 열린 PowerShell에서 한 줄씩 실행한다. 자동화 환경에서는 대화형 로그인 대신
+`SUPABASE_ACCESS_TOKEN`을 비밀 환경변수로 주입한다.
+
+`request-sync`는 최초 조회 등록과 즉시 수집 요청, `collect`는 한 유니온의 원자적 수집,
+`dispatch`는 갱신 대상 묶음 처리를 담당한다. 배포 뒤 Vercel에서 유니온을 조회해
+`pending` → `syncing` → `ok` 전환과 `sync_log` 기록을 확인한다.
+
+## BlablaLink 세션 갱신
+
+저장소 루트에서 `npm run session:update`를 실행하고 열린 전용 Edge 창에서 로그인한다. 이미 로그인된
+전용 프로필이면 쿠키 값을 출력하거나 자식 프로세스 명령행에 넣지 않고, 사용자 임시 폴더의 일회용
+env 파일을 통해 Supabase의 `BLABLA_COOKIE` secret을 갱신한 뒤 즉시 삭제한다.
+세션 만료 전 또는 화면에 세션 만료 오류가 표시될 때 다시 실행한다.
 
 ## 운영자 화면 잠금
 
@@ -31,11 +66,10 @@ Vercel Deployment Protection 또는 동등한 속도 제한도 추가한다. 현
 
 아래 순서를 모두 통과하기 전에는 세션 갱신, 큐 제어, 계수 저장 버튼을 활성화하지 않는다.
 
-1. Phase 0의 API 5종 응답을 확보하고 쿠키·openid·닉네임을 익명화한다.
-2. `GetGuildMembers`의 타 길드 권한 결과에 따라 경로 A/A′/B를 확정한다.
-3. Supabase 프로젝트에서 마이그레이션·RLS·`auth_session` anon 차단을 실제로 검증한다.
-4. 모든 쓰기가 `service_role` 전용 서버 API를 통하고 성공·실패가 `sync_log`에 남는지 검증한다.
-5. 운영자 변경 요청에 CSRF 방어, 입력 검증, 재인증 또는 감사 로그를 붙인다.
+1. Phase 0의 API 응답과 타 유니온 권한을 다시 확인하고 쿠키·openid·닉네임을 익명화한다.
+2. Supabase 프로젝트에서 마이그레이션·RLS·`auth_session` anon 차단을 실제로 검증한다.
+3. 모든 쓰기가 `service_role` 전용 서버 API를 통하고 성공·실패가 `sync_log`에 남는지 검증한다.
+4. 운영자 변경 요청에 CSRF 방어, 입력 검증, 재인증 또는 감사 로그를 붙인다.
 
 UI가 버튼을 활성화해 보이더라도 위 조건의 서버측 강제가 없으면 완료로 보지 않는다.
 

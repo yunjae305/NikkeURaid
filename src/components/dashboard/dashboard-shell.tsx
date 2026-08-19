@@ -33,6 +33,43 @@ function dashboardHref(
   return `/u/${model.guild.areaId}/${model.guild.guildId}?${params}`;
 }
 
+function FirstSyncPanel({ model }: { model: DashboardModel }) {
+  const syncing = model.guild.syncState === "syncing";
+
+  return (
+    <section className="first-sync-card" aria-labelledby="first-sync-title" aria-busy="true">
+      <div>
+        <p className="card-kicker">FIRST SYNC</p>
+        <h2 id="first-sync-title">
+          {syncing
+            ? "레이드 기록을 대시보드로 정리하고 있어요."
+            : "수집을 시작할 차례를 기다리고 있어요."}
+        </h2>
+        <p>
+          이 페이지를 열어 두지 않아도 수집은 계속됩니다. 다시 방문하면 같은 주소에서 결과를 확인할 수 있습니다.
+        </p>
+      </div>
+      <ol className="sync-stage-list">
+        <li className={syncing ? "is-complete" : "is-active"}>
+          <span>1</span>
+          <div><strong>요청 접수</strong><small>유니온 ID 확인</small></div>
+        </li>
+        <li className={syncing ? "is-active" : undefined}>
+          <span>2</span>
+          <div><strong>기록 수집</strong><small>명단과 공격 기록 동기화</small></div>
+        </li>
+        <li>
+          <span>3</span>
+          <div><strong>대시보드 준비</strong><small>순위와 조합 집계</small></div>
+        </li>
+      </ol>
+      <div className="loading-rows first-sync-skeleton" aria-hidden="true">
+        <span /><span /><span />
+      </div>
+    </section>
+  );
+}
+
 export function DashboardShell({
   model,
   activeTab,
@@ -41,6 +78,7 @@ export function DashboardShell({
   activeTab: DashboardTab;
 }) {
   const area = getArea(model.guild.areaId);
+  const firstSync = model.status === "syncing" && model.guild.lastSyncedAt === null;
 
   return (
     <div className="dashboard-page">
@@ -68,7 +106,9 @@ export function DashboardShell({
             </div>
             <h1 id="guild-title">{model.guild.name}</h1>
             <div className="guild-subline">
-              <span><UsersIcon aria-hidden="true" /> {model.guild.memberCount}명</span>
+              <span>
+                <UsersIcon aria-hidden="true" /> {firstSync && model.guild.memberCount === 0 ? "기본 정보 확인 중" : `${model.guild.memberCount}명`}
+              </span>
               <span><ClockIcon aria-hidden="true" /> {formatRelativeTime(model.guild.lastSyncedAt)}</span>
             </div>
           </div>
@@ -93,21 +133,27 @@ export function DashboardShell({
 
         <StatusBanner model={model} />
 
-        <nav className="dashboard-tabs" aria-label="대시보드 보기">
-          {tabs.map((tab) => (
-            <Link
-              key={tab.id}
-              href={dashboardHref(model, tab.id)}
-              aria-current={activeTab === tab.id ? "page" : undefined}
-            >
-              {tab.label}
-            </Link>
-          ))}
-        </nav>
+        {firstSync ? (
+          <FirstSyncPanel model={model} />
+        ) : (
+          <>
+            <nav className="dashboard-tabs" aria-label="대시보드 보기">
+              {tabs.map((tab) => (
+                <Link
+                  key={tab.id}
+                  href={dashboardHref(model, tab.id)}
+                  aria-current={activeTab === tab.id ? "page" : undefined}
+                >
+                  {tab.label}
+                </Link>
+              ))}
+            </nav>
 
-        {activeTab === "overview" ? <OverviewPanel model={model} /> : null}
-        {activeTab === "combos" ? <ComboPanel combos={model.combos} /> : null}
-        {activeTab === "trend" ? <TrendPanel trend={model.trend} /> : null}
+            {activeTab === "overview" ? <OverviewPanel model={model} /> : null}
+            {activeTab === "combos" ? <ComboPanel combos={model.combos} /> : null}
+            {activeTab === "trend" ? <TrendPanel trend={model.trend} /> : null}
+          </>
+        )}
       </main>
 
       <footer className="site-footer">

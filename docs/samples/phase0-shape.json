@@ -1,0 +1,70 @@
+{
+  "verified_at": "2026-08-19T05:02:00Z",
+  "privacy": {
+    "raw_payload_saved": false,
+    "cookie_values_saved": false,
+    "nicknames_saved": false,
+    "member_identifiers_saved": false
+  },
+  "authenticated_account_guild": {
+    "area_id": 83,
+    "current_raid": {
+      "api_code": 0,
+      "active": false,
+      "manager_id": "0",
+      "attack_count": 0
+    },
+    "members": {
+      "api_code": 0,
+      "count": 32,
+      "bind_area_id_histogram": {
+        "83": 31,
+        "0_unbound": 1
+      },
+      "item_keys": [
+        "bind_area_id",
+        "icon_id",
+        "level",
+        "member_id",
+        "nickname",
+        "synchro_level"
+      ]
+    },
+    "settled_seasons": [
+      { "season": 43, "attack_count": 138 },
+      { "season": 42, "attack_count": 145 },
+      { "season": 41, "attack_count": 151 },
+      { "season": 40, "attack_count": 147 },
+      { "season": 39, "attack_count": 144 },
+      { "season": 38, "attack_count": 138 },
+      { "season": 37, "attack_count": 141 },
+      { "season": 36, "attack_count": 141 },
+      { "season": 35, "attack_count": 149 }
+    ],
+    "attack_item_keys": [
+      "boss_id",
+      "day",
+      "difficulty",
+      "element_id",
+      "icon_id",
+      "is_final_hit",
+      "level",
+      "monster_model_id",
+      "name_localvalues",
+      "nickname",
+      "openid",
+      "squad",
+      "step",
+      "total_damage"
+    ],
+    "total_attacks": 1294,
+    "strict_schema_invalid_rows": 0,
+    "legacy_unique_key_count": 1293,
+    "source_order_stable_across_repeat_fetch": true
+  },
+  "other_guilds": {
+    "members_api_codes": [1303003, 1303027],
+    "settled_raid_api_code": 1303028,
+    "result": "permission_limited"
+  }
+}

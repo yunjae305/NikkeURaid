@@ -1,0 +1,14 @@
+{
+  "imports": {
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2.112.3"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true
+  },
+  "lint": {
+    "rules": {
+      "exclude": ["require-await"]
+    }
+  }
+}

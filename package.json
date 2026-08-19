@@ -10,7 +10,9 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:session": "node --test scripts/update_blablalink_session.test.mjs",
+    "session:update": "node scripts/update_blablalink_session.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.112.3",

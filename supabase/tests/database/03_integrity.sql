@@ -77,8 +77,8 @@ begin
 
   begin
     insert into public.attacks (
-      area_id, guild_id, season, day, boss, openid, nickname, total_damage
-    ) values (81, 'tap-integrity', 999, 0, 'Boss', 'bad-day', 'Bad', 1);
+      area_id, guild_id, season, source_index, day, boss, openid, nickname, total_damage
+    ) values (81, 'tap-integrity', 999, 0, 0, 'Boss', 'bad-day', 'Bad', 1);
     insert into tap_constraint_results values ('attack_day', false);
   exception when check_violation then
     insert into tap_constraint_results values ('attack_day', true);
@@ -86,8 +86,8 @@ begin
 
   begin
     insert into public.attacks (
-      area_id, guild_id, season, day, boss, openid, nickname, total_damage
-    ) values (81, 'tap-integrity', 999, 1, 'Boss', 'bad-damage', 'Bad', -1);
+      area_id, guild_id, season, source_index, day, boss, openid, nickname, total_damage
+    ) values (81, 'tap-integrity', 999, 0, 1, 'Boss', 'bad-damage', 'Bad', -1);
     insert into tap_constraint_results values ('attack_damage', false);
   exception when check_violation then
     insert into tap_constraint_results values ('attack_damage', true);
@@ -95,10 +95,10 @@ begin
 
   begin
     insert into public.attacks (
-      area_id, guild_id, season, day, boss, openid, nickname,
+      area_id, guild_id, season, source_index, day, boss, openid, nickname,
       total_damage, squad
     ) values (
-      81, 'tap-integrity', 999, 1, 'Boss', 'bad-squad', 'Bad', 1,
+      81, 'tap-integrity', 999, 0, 1, 'Boss', 'bad-squad', 'Bad', 1,
       '{"name":"not-an-array"}'::jsonb
     );
     insert into tap_constraint_results values ('attack_squad', false);

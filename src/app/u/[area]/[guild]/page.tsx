@@ -5,7 +5,8 @@ import {
   DashboardShell,
   type DashboardTab,
 } from "@/components/dashboard/dashboard-shell";
-import { isAreaId } from "@/lib/areas";
+import { GuildLookupStart } from "@/components/dashboard/guild-lookup-start";
+import { getArea, isAreaId } from "@/lib/areas";
 import { getDashboardModel, getGuildSummary } from "@/lib/data";
 
 type RouteParams = Promise<{ area: string; guild: string }>;
@@ -58,7 +59,15 @@ export default async function GuildDashboardPage({
     day: day === 1 || day === 2 ? day : undefined,
   });
 
-  if (!model) notFound();
+  if (!model) {
+    return (
+      <GuildLookupStart
+        areaId={route.areaId}
+        areaName={getArea(route.areaId).name}
+        guildId={route.guildId}
+      />
+    );
+  }
 
   const activeTab = parseTab(query.tab);
   const requestedSeason = parsePositiveInteger(query.season);
